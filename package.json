@@ -1,0 +1,12 @@
+{
+  "name": "playwright-login-test",
+  "version": "1.0.0",
+  "description": "Playwright tests for OrangeHRM login",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.42.1"
+  }
+}
