@@ -245,6 +245,26 @@ class DashboardPage {
     // Wait for login page to appear
     await this.page.waitForURL(/auth\/login/);
   }
+
+  async interactWithSubUnitPieChart(legendText = 'Quality Assurance') {
+    // Wait for the dashboard and pie chart to be visible
+    await this.page.waitForSelector('canvas', { timeout: 10000 }); // Pie chart is usually a canvas
+    await expect(this.page.locator('text=Employee Distribution by Sub Unit')).toBeVisible();
+
+    // Take screenshot before clicking legend
+    await this.page.screenshot({ path: 'test-results/piechart-before-legend.png', fullPage: true });
+
+    // Find the legend item by text and click it
+    const legendItem = this.page.locator(`.orangehrm-dashboard-widget-chart-legend li:has-text("${legendText}")`);
+    await expect(legendItem).toBeVisible();
+    await legendItem.click();
+
+    // Wait for the legend item to have strikethrough (CSS style: text-decoration: line-through)
+    await expect(legendItem).toHaveCSS('text-decoration-line', /line-through/);
+
+    // Take screenshot after clicking legend
+    await this.page.screenshot({ path: 'test-results/piechart-after-legend.png', fullPage: true });
+  }
 }
 
 module.exports = { DashboardPage }; 

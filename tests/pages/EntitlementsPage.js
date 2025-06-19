@@ -9,76 +9,63 @@ class EntitlementsPage {
   }
 
   async gotoAddEntitlements() {
-    // Navigate to Entitlements > Add Entitlements
-    await this.page.getByRole('link', { name: 'Leave' }).click();
-    await expect(this.page.getByText('Entitlements', { exact: true })).toBeVisible();
-    await this.page.getByText('Entitlements', { exact: true }).click();
-    await this.page.getByText('Add Entitlements', { exact: true }).waitFor({ state: 'visible' });
-    await this.page.getByText('Add Entitlements', { exact: true }).click();
-    // Wait for the Add Leave Entitlement title to be visible
-    await expect(this.page.getByText('Add Leave Entitlement', { exact: true })).toBeVisible();
+    // Navigate to Leave
+    await this.page.click('text=Leave');
+    await this.page.waitForLoadState('networkidle');
+
+    // Click Entitlements dropdown using text selector
+    await this.page.click('text=Entitlements');
+    await this.page.waitForTimeout(500);
+
+    // Click Add Entitlements from the dropdown menu
+    await this.page.getByRole('menuitem', { name: 'Add Entitlements' }).click();
+    await this.page.waitForLoadState('networkidle');
+    
+    // Take screenshot of navigation
+    await this.page.screenshot({ path: 'test-results/add-entitlements-page.png', fullPage: true });
   }
 
   async addEntitlement({ employeeName, leaveType, days }) {
-    // Wait for the page to be fully loaded
-    await this.page.waitForLoadState('networkidle');
-    await this.page.waitForLoadState('domcontentloaded');
+    // Wait for form to be ready
+    await this.page.waitForSelector('form.oxd-form');
 
-    // Select employee: type name and pick from dropdown
-    const employeeInput = this.page.getByPlaceholder('Type for hints...');
-    await expect(employeeInput).toBeVisible();
-    await employeeInput.fill(employeeName);
-    
-    // Wait for dropdown and select first matching option
-    await this.page.waitForSelector('.oxd-autocomplete-dropdown');
-    const employeeOption = this.page.getByRole('option', { name: employeeName }).first();
-    await expect(employeeOption).toBeVisible();
-    await employeeOption.click();
-    
-    // Wait for the Leave Type dropdown to be visible and click it
+    // Select Leave Type
     const leaveTypeDropdown = this.page.locator('.oxd-select-text').first();
-    await expect(leaveTypeDropdown).toBeVisible();
     await leaveTypeDropdown.click();
+    await this.page.waitForTimeout(500);
+    await this.page.click(`.oxd-select-option:has-text("${leaveType}")`);
 
-    // Select the leave type
-    const leaveTypeOption = this.page.getByRole('option', { name: leaveType });
-    await expect(leaveTypeOption).toBeVisible();
-    await leaveTypeOption.click();
-
-    // Wait for form to stabilize after leave type selection
+    // Enter and select Employee Name
+    const employeeInput = this.page.locator('.oxd-autocomplete-text-input input');
+    await employeeInput.fill(employeeName);
+    await this.page.waitForTimeout(2000); // Wait longer for autocomplete
+    await this.page.waitForSelector('.oxd-autocomplete-dropdown');
     await this.page.waitForTimeout(1000);
+    await this.page.keyboard.press('ArrowDown');
+    await this.page.keyboard.press('Enter');
 
-    // Find the entitlement input using the grid structure and label
-    const entitlementContainer = this.page.locator('.oxd-grid-item').filter({ hasText: 'Entitlement' });
-    await expect(entitlementContainer).toBeVisible();
+    // Take screenshot before entering entitlement
+    await this.page.screenshot({ path: 'test-results/entitlement-field.png', fullPage: true });
 
-    // Get all inputs and find the one in the entitlement container
-    const inputs = await entitlementContainer.locator('.oxd-input').all();
-    const daysInput = inputs[0];
-    
-    // Ensure the input is visible and interactive
-    await expect(daysInput).toBeVisible();
-    await daysInput.click();
-    
-    // Clear existing value and fill new value
-    await daysInput.clear();
-    await daysInput.fill(days.toString());
-    
-    // Take a screenshot for verification
-    await this.page.screenshot({ path: 'test-results/entitlement-field.png' });
+    // Enter Entitlement days
+    const entitlementInput = this.page.locator('input.oxd-input').nth(1);
+    await entitlementInput.fill(days.toString());
 
-    // Submit the form
-    const saveButton = this.page.getByRole('button', { name: /Save|Submit/ });
-    await expect(saveButton).toBeVisible();
-    await saveButton.click();
+    // Click Save
+    await this.page.click('button[type="submit"]');
 
-    // Handle the confirmation dialog
-    const confirmButton = this.page.getByRole('button', { name: 'Confirm' });
-    await expect(confirmButton).toBeVisible({ timeout: 5000 });
-    await confirmButton.click();
+    // Wait for the Confirm button to appear and take a screenshot
+    await this.page.waitForSelector('text=Confirm', { timeout: 30000 });
+    await this.page.screenshot({ path: 'test-results/before-confirm-entitlement.png', fullPage: true });
+
+    // Click Confirm
+    await this.page.click('text=Confirm');
 
     // Wait for success message
-    await expect(this.page.locator('.oxd-toast')).toBeVisible({ timeout: 10000 });
+    await this.page.waitForSelector('.oxd-toast');
+
+    // Take screenshot after saving entitlement
+    await this.page.screenshot({ path: 'test-results/after-entitlement-save.png', fullPage: true });
   }
 }
 

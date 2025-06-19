@@ -16,13 +16,13 @@ const periodEnd = nextYear.endOf('year').toFormat('yyyy-MM-dd');   // Dec 31st n
 
 // Generate a unique employee ID with timestamp
 const generateEmployeeId = () => {
-    const timestamp = DateTime.now().toFormat('MMddHHmm');
+    const timestamp = DateTime.now().toFormat('MMddHHmmssSSS'); // Add seconds and milliseconds
     return `E${timestamp}`;
 };
 
 // Generate a unique username with timestamp
 const timestamp = DateTime.now().toFormat('MMddHHmm');
-const uniqueUsername = `div.auto${timestamp}`;
+const uniqueUsername = `hello.div${timestamp}`;
 
 const testData = {
     // Admin credentials (constant in demo environment)
@@ -34,11 +34,11 @@ const testData = {
 
     // Employee data matching all available fields in PIM
     employee: {
-        firstName: "Div",
-        middleName: "Test",
-        lastName: "Automation",
-        fullName: "Div Automation", // Used in dropdowns and searches
-        employeeId: generateEmployeeId(),
+        firstName: "Hello",
+        middleName: "",
+        lastName: "Div",
+        fullName: "Hello Div", // Used in dropdowns and searches
+        employeeId: generateEmployeeId,
         gender: "Male", // Matches dropdown option
         maritalStatus: "Single", // Matches dropdown option
         nationality: "American", // Matches dropdown option
@@ -67,8 +67,8 @@ const testData = {
         homePhone: "415-555-0123",
         mobile: "415-555-0124",
         workPhone: "415-555-0125",
-        workEmail: "john.automation@orangehrm.com",
-        otherEmail: "john.test@example.com"
+        workEmail: "hello.div@orangehrm.com",
+        otherEmail: "hello.div@example.com"
     },
 
     // Emergency contact
@@ -82,7 +82,7 @@ const testData = {
 
     // Leave entitlement data
     leaveEntitlement: {
-        employeeName: "Div Automation",
+        employeeName: "Hello Div",
         leaveType: "CAN - Bereavement",
         entitlementDays: 5,
         period: `${periodStart} to ${periodEnd}` // Next year's period
@@ -90,10 +90,10 @@ const testData = {
 
     // Leave application data
     leaveApplication: {
-        employeeName: "Div Automation",
+        employeeName: "Hello Div",
         leaveType: "CAN - Bereavement",
-        fromDate: "2025-06-22",
-        toDate: "2025-06-24",
+        fromDate: "2025-07-22",
+        toDate: "2025-07-24",
         partialDays: "None",
         duration: "Full Day",
         comment: "Automated test leave request"
